@@ -1,0 +1,20 @@
+# Node/Express Server Config
+PORT=4000
+LOG_LEVEL=info
+NODE_ENV=development
+
+#JWT
+JWT_SECRET=
+
+# Database Config
+DB_NAME=
+DB_USER=user
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+
+#Cloudinary Config
+CLOUD_NAME=
+CLOUDINARY_API_NAME=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_UPLOAD_PRESET=
