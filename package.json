@@ -1,36 +1,36 @@
 {
-	"name": "dotmac-backend",
+	"name": "blog-backend",
 	"version": "1.0.0",
-	"description": "Dotmac ERP",
-	"main": "./build/app/app.js",
+	"description": "Blog",
+	"main": "./build/app",
 	"scripts": {
-		"prestart": "node check-env.js DB_HOST DB_USER DB_PASSWORD DB_NAME DB_PORT JWT_SECRET NODE_ENV LOG_LEVEL PORT",
+		"prestart": "node check-env.js DB_USER DB_URI DB_PASSWORD DB_NAME JWT_SECRET NODE_ENV LOG_LEVEL",
 		"test": "nyc mocha --exit",
 		"pretest": "npm run prestart",
 		"pretest-coverage": "npm run prestart",
 		"test-coverage": "istanbul cover _mocha --exit",
-		"start": "node ./build/app/app.js",
+		"start": "node ./build/app",
 		"seed:superAdmin": "ts-node-dev --transpileOnly ./db/seeds/seed.ts",
 		"build": "tsc",
-		"prod": "build && node ./build/app/app.js",
+		"prod": "build && node ./build/app",
 		"t": "node ./generators/index.js",
 		"constant": "npm run t g constant",
 		"model": "npm run t g model",
 		"module": "npm run t g module",
 		"tests": "npm run t g test",
-		"dev": "set DEBUG=dotmac* & npm run prestart && ts-node-dev --respawn --transpileOnly ./app/app.ts",
-		"dev:mac": "npm run prestart && DEBUG=dotmac* ts-node-dev --respawn --transpileOnly ./app/app.ts"
+		"dev": "set DEBUG=blog* & npm run prestart && ts-node-dev --respawn --transpileOnly ./app",
+		"dev:mac": "npm run prestart && DEBUG=blog* ts-node-dev --respawn --transpileOnly ./app"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/isahohieku/dotmac-backend.git"
+		"url": "git+https://github.com/isahohieku/blog-backend.git"
 	},
 	"author": "Isah Ohieku",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/isahohieku/dotmac-backend/issues"
+		"url": "https://github.com/isahohieku/blog-backend/issues"
 	},
-	"homepage": "https://github.com/isahohieku/dotmac-backend#readme",
+	"homepage": "https://github.com/isahohieku/blog-backend#readme",
 	"devDependencies": {
 		"@types/bcrypt": "^3.0.0",
 		"@types/chai": "^4.1.7",
