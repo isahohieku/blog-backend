@@ -8,10 +8,8 @@ JWT_SECRET=
 
 # Database Config
 DB_NAME=
-DB_USER=user
+DB_USER=
 DB_PASSWORD=
-DB_HOST=
-DB_PORT=
 
 #Cloudinary Config
 CLOUD_NAME=
