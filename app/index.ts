@@ -6,6 +6,8 @@ import Logger from '../utils/logger';
 import Db from '../db';
 import middlewaresConfig from '../middlewares';
 import routesConfig from '../lib/routesConfig';
+import unknownRouteConfig from '../responses/error/unkown-routes';
+import errorHandlerConfig from '../responses/error/error-handler';
 
 /* App declaration */
 const app: Application = express();
@@ -18,6 +20,12 @@ middlewaresConfig(app);
 
 /* Route Configuration */
 routesConfig();
+
+/* Missing routes Configuration */
+app.use(unknownRouteConfig);
+
+/* Global Error Handling Configuration */
+app.use(errorHandlerConfig);
 
 /* App initialization */
 const { PORT } = process.env;
