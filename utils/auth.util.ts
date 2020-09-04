@@ -1,13 +1,15 @@
 import { config } from 'dotenv';
 config({ path: __dirname + '/../../../.env' });
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { CustomError } from '../lib/custom.error';
-import { codes } from '../constants/api_response_codes.constants';
-import { messages } from '../constants/messages.constants';
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
-import { UserI } from 'models/user';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import CustomError from '../responses/error/custom-error';
+import httpCodes from '../constants/http-status-codes';
+import responseCodes from '../constants/response-codes';
+import responseMessages from '../constants/response-messages';
+
+import { UserI } from '../models/user';
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const userData = ['fullName', 'id',
@@ -15,7 +17,7 @@ const userData = ['fullName', 'id',
 
 const generateJWT = (model: UserI): string => {
     return jwt.sign(model, SECRET_KEY as jwt.Secret, {
-        expiresIn: 60 * 60 * 24 // expires in a day
+        expiresIn: 60 * 60 * 24 * 7 // expires in a week
     });
 };
 
@@ -29,7 +31,7 @@ const passwordMatch = async (password: string, hash: string): Promise<boolean | 
     return match;
 };
 
-const pickUserData = (object: any): any => _.pick(object, userData);
+const pickUserData = (object: UserI): Partial<UserI> => _.pick(object, userData);
 
 const pickToken = (req: Request): string | undefined => {
     let token: string | undefined = req.headers['x-access-token'] as string || req.headers['authorization'];
@@ -46,7 +48,8 @@ const verifyTok = (req: Request, res: Response, token: string): object | undefin
 
         jwt.verify(token, SECRET_KEY, (err, decoded): void => {
             if (err) {
-                throw new CustomError(codes.ERROR_INVALID_TOKEN, messages.ERROR_INVALID_TOKEN, 401);
+                throw new CustomError(responseCodes.UNAUTHORIZED,
+                    responseMessages.INVALID_TOKEN, httpCodes.UNAUTHORIZED);
             }
             decodedToken = decoded;
         });
@@ -55,7 +58,6 @@ const verifyTok = (req: Request, res: Response, token: string): object | undefin
 };
 
 export {
-    // generateJWT,
     generateEncryptedPassword,
     passwordMatch,
     pickUserData,
