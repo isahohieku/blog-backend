@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Application } from 'express';
 import Route from '../route';
 import Routes from '../../routes';
 
-const configureRoutes = (): void => {
+const configureRoutes = (app: Application): void => {
     for (const route of Routes as Route[]) {
         const { method, path, middlewares, controller } = route;
-        Router[method](path, middlewares, controller);
+        app[method](path, middlewares, controller);
     };
 };
 

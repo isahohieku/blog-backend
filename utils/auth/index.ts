@@ -4,12 +4,12 @@ import * as _ from 'lodash';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import CustomError from '../responses/error/custom-error';
-import httpCodes from '../constants/http-status-codes';
-import responseCodes from '../constants/response-codes';
-import responseMessages from '../constants/response-messages';
+import CustomError from '../../responses/error/custom-error';
+import httpCodes from '../../constants/http-status-codes';
+import responseCodes from '../../constants/response-codes';
+import responseMessages from '../../constants/response-messages';
 
-import { UserI } from '../models/user';
+import { UserI } from '../../models/user';
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const userData = ['fullName', 'id',
