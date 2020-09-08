@@ -22,7 +22,7 @@ const generateJWT = (model: UserI): string => {
 };
 
 const generateEncryptedPassword = async (data: string | undefined): Promise<string | undefined> => {
-    let password = bcrypt.hash(data, 12);
+    let password = await bcrypt.hash(data, 12);
     return password;
 };
 

@@ -15,6 +15,7 @@ import EmailService from '../../lib/email';
 import { mailVerificationTemplate } from '../../email-templates/mail-verification';
 import { forgotPasswordTemplate } from '../../email-templates/forgot-password';
 import { resetPasswordTemplate } from '../../email-templates/reset-password';
+import { registrationTemplate } from '../../email-templates/registration';
 
 
 class UserService {
@@ -91,7 +92,7 @@ class UserService {
             }
 
 
-            const result = await User.findOneAndUpdate({_id: user.id}, params, { new: true });
+            const result = await User.findOneAndUpdate({ _id: user.id }, params, { new: true });
 
 
             sendSuccess(res, 'user.service.ts', result, 'Update Successful');
@@ -124,6 +125,37 @@ class UserService {
         } catch (e) {
             next(e);
         };
+    }
+
+    public async requestVerificaitonEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { email } = req.body;
+            if (!email) {
+                throw new CustomError(responseCodes.FORBIDDEN,
+                    'Email required', httpCodes.FORBIDDEN);
+            }
+            const user = await User.find({ email }) as UserI[];
+
+            if (!user.length) {
+                throw new CustomError(responseCodes.USER_EXIST,
+                    responseMessages.RESOURCE_EXIST('User'), httpCodes.UNAUTHORIZED);
+            }
+
+            if (user[0].isEmailVerified) {
+                throw new CustomError(responseCodes.FORBIDDEN,
+                    `${user[0].email} is already verified`, httpCodes.FORBIDDEN);
+            }
+
+            const params = { verificationToken: uuidv1() };
+
+            const result = await User.findOneAndUpdate({ _id: user[0].id }, params, { new: true });
+            await EmailService.sendEmail(user[0].email, 'Welcome to Vehicle Registration', null, null,
+                registrationTemplate(user[0].verificationToken, user[0]));
+
+            sendSuccess(res, 'user.controllers.ts', result, 'Email successfully confirmed');
+        } catch (e) {
+            next(e);
+        }
     }
 
     public async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {

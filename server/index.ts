@@ -1,10 +1,12 @@
 import express, { Application } from "express";
 import { createServer, Server as HTTPServer } from "http";
+import swaggerUi from 'swagger-ui-express';
 import Logger from '../utils/logger';
 import middlewares from '../middlewares';
 import routes from '../lib/routesConfig';
 import unknownRouteConfig from '../responses/error/unkown-routes';
 import errorHandlerConfig from '../responses/error/error-handler';
+import * as swaggerDocument from '../doc/swagger.json';
 
 export default class Server {
     private httpServer: HTTPServer;
@@ -13,6 +15,7 @@ export default class Server {
     public constructor() {
         this.initialize();
         this.configureMiddlewares();
+        this.handleSwaggerUI();
         this.configureRoutes();
         this.handleMissingRoutes();
         this.handleErrorsGlobally();
@@ -24,11 +27,11 @@ export default class Server {
     }
 
     private configureMiddlewares(): void {
-        this.app.use(middlewares);
+        middlewares(this.app);
     }
 
     private configureRoutes(): void {
-        this.app.use(routes);
+        routes(this.app);
     }
 
     private handleMissingRoutes(): void {
@@ -37,6 +40,10 @@ export default class Server {
 
     private handleErrorsGlobally(): void {
         this.app.use(errorHandlerConfig);
+    }
+
+    private handleSwaggerUI(): void {
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     }
 
     public listen(): void {

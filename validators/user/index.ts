@@ -20,8 +20,7 @@ const createUserValidator = Joi.object().keys({
 
 const updateUserValidator = Joi.object().keys({
     id: Joi.string().required(),
-    firstName: Joi.string().optional(),
-    lastName: Joi.string().optional(),
+    fullName: Joi.string().optional(),
     occupation: Joi.string().optional(),
     stateOfOrigin: Joi.string().optional(),
     gender: Joi.string().optional(),

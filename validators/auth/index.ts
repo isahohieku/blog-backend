@@ -14,8 +14,7 @@ const signupValidator = Joi.object().keys({
         .email()
         .required(),
     password: Joi.string().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required()
+    fullName: Joi.string().required()
 });
 
 const loginValidator = Joi.object().keys({

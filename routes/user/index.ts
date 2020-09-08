@@ -37,6 +37,12 @@ const userEndpoints: Route[] = [
         controller: [User.confirmEmail]
     },
     {
+        path: `${USER_URL}/user/request-verification`,
+        method: HttpMethod.POST,
+        middlewares: [validateEmailVerification],
+        controller: [User.requestVerificaitonEmail]
+    },
+    {
         path: `${USER_URL}/user/forgot-password`,
         method: HttpMethod.POST,
         middlewares: [validateForgotPassword],
