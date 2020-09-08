@@ -1,6 +1,6 @@
 // import UserHandler from '../services/user/user.handler';
 import Mongoose, { Schema, Document } from 'mongoose';
-import { generateEncryptedPassword } from '../../utils/auth.util';
+import { generateEncryptedPassword } from '../../utils/auth';
 
 export interface UserI extends Document {
     fullName: string;
