@@ -23,12 +23,6 @@ const userEndpoints: Route[] = [
     },
     {
         path: `${USER_URL}/user`,
-        method: HttpMethod.POST,
-        middlewares: [verifyToken, validateCreateUser],
-        controller: [User.createUser]
-    },
-    {
-        path: `${USER_URL}/user`,
         method: HttpMethod.PUT,
         middlewares: [verifyToken, validateUpdateUser],
         controller: [User.updateUser]

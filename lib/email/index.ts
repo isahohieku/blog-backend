@@ -13,6 +13,7 @@ class EmailHandler {
             domain: this.domain
         }
     };
+
     private mailgunTransporter: mailgunTransport.MailgunTransport = mailgunTransport(this.mailgunOptions);
     private transporter: Transporter;
     private mailgun: mg.Mailgun = mg({ apiKey: this.api_key, domain: this.domain });
@@ -60,26 +61,9 @@ class EmailHandler {
 
             this.transporter.sendMail(mailOptions, (error, info): any => {
                 if (error) { return reject(error); }
-                console.log(info);
-                console.log('Error', error);
                 return resolve(info);
             });
 
-        });
-    }
-
-    public addToMailingList(listName: string, subscriber: { fullName: string; email: string }): Promise<any> {
-        return new Promise((resolve, reject): any => {
-            const list = this.mailgun.lists(`${listName}@${this.domain}`);
-            const newSubscriber = {
-                subscribed: true,
-                address: subscriber.email,
-                name: subscriber.fullName
-            };
-
-            list.members().create(newSubscriber, function (error, data): any {
-                return error ? reject(error) : resolve(data);
-            });
         });
     }
 }

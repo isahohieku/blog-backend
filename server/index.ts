@@ -1,5 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express, { Application } from "express";
 import { createServer, Server as HTTPServer } from "http";
+import Db from '../db';
 import swaggerUi from 'swagger-ui-express';
 import Logger from '../utils/logger';
 import middlewares from '../middlewares';
@@ -10,10 +13,11 @@ import * as swaggerDocument from '../doc/swagger.json';
 
 export default class Server {
     private httpServer: HTTPServer;
-    private app: Application;
+    public app: Application;
 
     public constructor() {
-        this.initialize();
+        this.setupDb();
+        this.initializeApp();
         this.configureMiddlewares();
         this.handleSwaggerUI();
         this.configureRoutes();
@@ -21,7 +25,7 @@ export default class Server {
         this.handleErrorsGlobally();
     }
 
-    private initialize(): void {
+    private initializeApp(): void {
         this.app = express();
         this.httpServer = createServer(this.app);
     }
@@ -44,6 +48,11 @@ export default class Server {
 
     private handleSwaggerUI(): void {
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    }
+
+    private setupDb(): void {
+        /* Setup Db */
+        Db();
     }
 
     public listen(): void {
