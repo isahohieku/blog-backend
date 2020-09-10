@@ -6,6 +6,7 @@ import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
 
 const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): Response => {
+    console.log(err);
     if (err instanceof CustomError) {
         Logger('error.response.ts', err.message, 'error'); // For debugging
         const message = (typeof err === 'string') ? err : err.message;
