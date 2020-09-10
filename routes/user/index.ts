@@ -4,10 +4,13 @@ import {
     validateCreateUser,
     validateUpdateUser,
     validateForgotPassword,
-    validateResetPassword
+    validateResetPassword,
+    validatePasswordUpdate,
+    validateAvatarUpdate
 } from '../../validators/user';
 import User from '../../controllers/user';
 import { verifyToken, validateEmailVerification } from '../../validators/auth';
+import UploadImage from '../../middlewares/image-upload';
 
 const USER_URL = '/api';
 
@@ -41,6 +44,19 @@ const userEndpoints: Route[] = [
         method: HttpMethod.POST,
         middlewares: [validateEmailVerification],
         controller: [User.requestVerificaitonEmail]
+    },
+    {
+        path: `${USER_URL}/user/change-password`,
+        method: HttpMethod.POST,
+        middlewares: [verifyToken, validatePasswordUpdate],
+        controller: [User.updatePassword]
+    },
+    {
+        path: `${USER_URL}/user/avatar`,
+        method: HttpMethod.POST,
+        middlewares: [verifyToken, UploadImage
+            .handleUploadS3().single(process['env']['AVATAR'] as string)],
+        controller: [User.updateAvatar]
     },
     {
         path: `${USER_URL}/user/forgot-password`,

@@ -57,6 +57,10 @@ UserSchema.post('find', function (doc: any): void {
     delete doc.password;
 });
 
+UserSchema.post('update', function (doc: any): void {
+    delete doc.password;
+});
+
 /* Admin User */
 const AdminSchema = new Schema({
     createdBy: { type: Schema.Types.ObjectId, ref: 'Admin' },

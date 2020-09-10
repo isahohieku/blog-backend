@@ -21,16 +21,19 @@ const createUserValidator = Joi.object().keys({
 const updateUserValidator = Joi.object().keys({
     id: Joi.string().required(),
     fullName: Joi.string().optional(),
-    occupation: Joi.string().optional(),
-    stateOfOrigin: Joi.string().optional(),
-    gender: Joi.string().optional(),
-    dob: Joi.string().optional(),
-    address: Joi.string().optional(),
+    bio: Joi.string().optional(),
     password: Joi.string().optional(),
-    status: Joi.string().optional(),
-    avatar: Joi.string().optional(),
     isEmailVerified: Joi.boolean().optional(),
     adminType: Joi.string().optional()
+});
+
+const updateUserAvatar = Joi.object().keys({
+    blogAvatar: Joi.any().required()
+});
+
+const updateUserPassword = Joi.object().keys({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().required()
 });
 
 const forgetPasswordValidator = Joi.object().keys({
@@ -92,9 +95,31 @@ const validateResetPassword: RouteHandler =
         }
     };
 
+const validateAvatarUpdate: RouteHandler =
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            await Joi.validate(req.body, updateUserAvatar);
+            next();
+        } catch (e) {
+            throwError(next, e.details);
+        }
+    };
+
+const validatePasswordUpdate: RouteHandler =
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            await Joi.validate(req.body, updateUserPassword);
+            next();
+        } catch (e) {
+            throwError(next, e.details);
+        }
+    };
+
 export {
     validateCreateUser,
     validateUpdateUser,
     validateForgotPassword,
-    validateResetPassword
+    validateResetPassword,
+    validateAvatarUpdate,
+    validatePasswordUpdate
 };

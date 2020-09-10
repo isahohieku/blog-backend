@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { v1 as uuidv1 } from 'uuid';
+import aws from 'aws-sdk';
 
 import sendSuccess from '../../responses/success';
 import CustomError from '../../responses/error/custom-error';
@@ -9,14 +10,20 @@ import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 
 import { User, UserI, AdminI, Admin } from '../../models/user';
-import { verifyTok, pickToken } from '../../utils/auth';
+import { verifyTok, pickToken, passwordMatch, generateEncryptedPassword } from '../../utils/auth';
+
+import { MulterFile } from '../../middlewares/image-upload';
 
 import EmailService from '../../lib/email';
 import { mailVerificationTemplate } from '../../email-templates/mail-verification';
 import { forgotPasswordTemplate } from '../../email-templates/forgot-password';
 import { resetPasswordTemplate } from '../../email-templates/reset-password';
 import { registrationTemplate } from '../../email-templates/registration';
+import { DeleteObjectRequest } from 'aws-sdk/clients/s3';
 
+interface RequestFileWithLocation extends Request {
+    hi: string;
+}
 
 class UserService {
     public constructor() { }
@@ -156,6 +163,77 @@ class UserService {
         } catch (e) {
             next(e);
         }
+    }
+
+    public async updatePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { oldPassword, newPassword } = req.body;
+
+            const token: string = pickToken(req);
+            const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
+            const user = await User.findOne({ _id: userData.id }) as UserI;
+
+            const password = await passwordMatch(oldPassword, user.password);
+
+            if (!password) {
+                throw new CustomError(responseCodes.FORBIDDEN,
+                    'Wrong password', httpCodes.FORBIDDEN);
+            }
+
+            const params = { password: await generateEncryptedPassword(newPassword) };
+
+            const result = await User.findOneAndUpdate({ _id: user.id }, params, { new: true });
+            // await EmailService.sendEmail(user[0].email, 'Reset Password', null, null,
+            //     forgotPasswordTemplate(user[0], params.forgotPasswordToken));
+            delete result.password;
+
+            sendSuccess(res, 'user.controllers.ts', result, 'Email changed successfully');
+        } catch (e) {
+            next(e);
+        };
+    }
+
+    public async updateAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const { location } = req.file as MulterFile;
+
+            const token: string = pickToken(req) as string;
+            const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
+
+            const user = await User.findOne({ _id: userData.id }) as UserI;
+
+            // Delete previous avatar
+            if (user.avatar) {
+                const { AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, BUCKET } = process.env;
+                const s3 = new aws.S3({
+                    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+                    accessKeyId: AWS_ACCESS_KEY_ID
+                });
+
+                const deleteParams: DeleteObjectRequest = {
+                    Bucket: BUCKET as string,
+                    Key: user.avatar
+                };
+
+                await new Promise((resolve, reject): void => {
+                    s3.deleteObject(deleteParams, (err: any, data: any): void => {
+                        resolve(data);
+                        reject(err);
+                    });
+                });
+            }
+
+            user.avatar = location;
+
+            const params = { avatar: location };
+
+            const result: UserI = await User.findOneAndUpdate({ _id: user.id }, params, { new: true }) as UserI;
+
+            sendSuccess(res, 'user.controllers.ts', result, 'Avatar changed successfully');
+        } catch (e) {
+            next(e);
+        };
     }
 
     public async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {

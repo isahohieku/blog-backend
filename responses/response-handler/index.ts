@@ -7,11 +7,11 @@ interface APIResponseI {
 }
 
 class APIResponse implements APIResponseI {
-    public code;
-    public statusCode;
-    public message;
-    public data;
-    public pagination;
+    public code: string;
+    public statusCode: number;
+    public message: string;
+    public data: any;
+    public pagination: any;
 
     public constructor(
         code: string,
