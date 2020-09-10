@@ -44,31 +44,6 @@ class UserService {
         };
     }
 
-    public async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        try {
-            const { admin } = req.body;
-            const data: UserI | AdminI = req.body;
-            const user = await User.find({ email: data.email });
-
-            if (user.length) {
-                throw new CustomError(responseCodes.USER_EXIST,
-                    responseMessages.RESOURCE_EXIST('User'), httpCodes.UNAUTHORIZED);
-            }
-
-            const query = !admin ? new User(data) : new Admin(data);
-
-            const result = await query.save() as (UserI | AdminI);
-
-            delete result.password;
-            delete result.token;
-
-            sendSuccess(res, 'user.service.ts', result, 'User created Successfully');
-        } catch (e) {
-            next(e);
-        };
-    }
-
     public async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
 
         try {
