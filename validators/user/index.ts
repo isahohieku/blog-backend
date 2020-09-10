@@ -32,7 +32,6 @@ const updateUserAvatar = Joi.object().keys({
 });
 
 const updateUserPassword = Joi.object().keys({
-    id: Joi.string().required(),
     oldPassword: Joi.string().required(),
     newPassword: Joi.string().required()
 });

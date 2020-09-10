@@ -10,9 +10,9 @@ import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 
 import { User, UserI, AdminI, Admin } from '../../models/user';
-import { verifyTok, pickToken, passwordMatch } from '../../utils/auth';
+import { verifyTok, pickToken, passwordMatch, generateEncryptedPassword } from '../../utils/auth';
 
-import avatarHandler, { MulterFile } from '../../middlewares/image-upload';
+import { MulterFile } from '../../middlewares/image-upload';
 
 import EmailService from '../../lib/email';
 import { mailVerificationTemplate } from '../../email-templates/mail-verification';
@@ -169,20 +169,23 @@ class UserService {
         try {
             const { oldPassword, newPassword } = req.body;
 
-            const userObject: Partial<UserI> = pickToken(req);
+            const token: string = pickToken(req);
+            const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
+            const user = await User.findOne({ _id: userData.id }) as UserI;
 
-            const user = await User.findOne({ _id: userObject.id }) as UserI;
+            const password = await passwordMatch(oldPassword, user.password);
 
-            if (!await passwordMatch(oldPassword, user.password)) {
+            if (!password) {
                 throw new CustomError(responseCodes.FORBIDDEN,
                     'Wrong password', httpCodes.FORBIDDEN);
             }
 
-            const params = { password: newPassword };
+            const params = { password: await generateEncryptedPassword(newPassword) };
 
             const result = await User.findOneAndUpdate({ _id: user.id }, params, { new: true });
             // await EmailService.sendEmail(user[0].email, 'Reset Password', null, null,
             //     forgotPasswordTemplate(user[0], params.forgotPasswordToken));
+            delete result.password;
 
             sendSuccess(res, 'user.controllers.ts', result, 'Email changed successfully');
         } catch (e) {
