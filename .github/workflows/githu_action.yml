@@ -9,11 +9,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-      - env:
+    env:
         PORT: 3000
         LOG_LEVEL: info
         NODE_ENV: development
@@ -29,7 +25,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         BUCKET: ${{ secrets.BUCKET }}
         BASE_URL: ${{ secrets.BASE_URL }}
-
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
         uses: actions/cache@v1
         with:
           path: ~/.npm
