@@ -1,0 +1,49 @@
+name: Build
+on:
+  pull_request:
+    branches:
+      - dev
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    env:
+        PORT: 3000
+        LOG_LEVEL: info
+        NODE_ENV: development
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        DB_NAME: ${{ secrets.DB_USER }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_URI: ${{ secrets.DB_URI }}
+        AVATAR: blogAvatar
+        MAILGUN_ACTIVE_API_KEY: ${{ secrets.MAILGUN_ACTIVE_API_KEY }}
+        MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        BUCKET: ${{ secrets.BUCKET }}
+        BASE_URL: ${{ secrets.BASE_URL }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install packages
+        run: npm install
+      - name: Run test
+        run: npm run test
+      - name: Add test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODE_COV }}
+          file: ./coverage/contestify/lcov.info
