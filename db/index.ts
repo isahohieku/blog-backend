@@ -28,7 +28,7 @@ connection.on('connected', (): void => {
 });
 
 // on error
-connection.on('error', async(err: any): Promise<void> => {
+connection.on('error', (err: any): void => {
     Logger('database.ts', `Mongoose connection error: ${err}`, 'error');
     setTimeout(connectDb, nextRetry);
 });

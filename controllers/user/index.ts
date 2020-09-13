@@ -9,7 +9,7 @@ import httpCodes from '../../constants/http-status-codes';
 import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 
-import { User, UserI, AdminI, Admin } from '../../models/user';
+import { User, UserI, AdminI } from '../../models/user';
 import { verifyTok, pickToken, passwordMatch, generateEncryptedPassword } from '../../utils/auth';
 
 import { MulterFile } from '../../middlewares/image-upload';
@@ -73,9 +73,7 @@ class UserService {
                 skips.push('status');
             }
 
-
             const result = await User.findOneAndUpdate({ _id: user.id }, params, { new: true });
-
 
             sendSuccess(res, 'user.service.ts', result, 'Update Successful');
         } catch (e) {
@@ -89,8 +87,8 @@ class UserService {
             const user = await User.find({ email: data.email }) as UserI[];
 
             if (!user.length) {
-                throw new CustomError(responseCodes.USER_EXIST,
-                    responseMessages.RESOURCE_EXIST('User'), httpCodes.UNAUTHORIZED);
+                throw new CustomError(responseCodes.USER_NOT_FOUND,
+                    responseMessages.RESOURCE_NOT_FOUND('User'), httpCodes.UNAUTHORIZED);
             }
 
             if (data.verificationToken !== user[0].verificationToken) {
@@ -119,8 +117,8 @@ class UserService {
             const user = await User.find({ email }) as UserI[];
 
             if (!user.length) {
-                throw new CustomError(responseCodes.USER_EXIST,
-                    responseMessages.RESOURCE_EXIST('User'), httpCodes.UNAUTHORIZED);
+                throw new CustomError(responseCodes.USER_NOT_FOUND,
+                    responseMessages.RESOURCE_NOT_FOUND('User'), httpCodes.UNAUTHORIZED);
             }
 
             if (user[0].isEmailVerified) {
@@ -148,6 +146,7 @@ class UserService {
             const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
             const user = await User.findOne({ _id: userData.id }) as UserI;
 
+            console.log(user);
             const password = await passwordMatch(oldPassword, user.password);
 
             if (!password) {
@@ -177,6 +176,10 @@ class UserService {
             const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
 
             const user = await User.findOne({ _id: userData.id }) as UserI;
+            if (!user) {
+                throw new CustomError(responseCodes.NOT_FOUND,
+                    responseMessages.RESOURCE_NOT_FOUND('User'), httpCodes.NOT_FOUND);
+            }
 
             // Delete previous avatar
             if (user.avatar) {
@@ -248,7 +251,7 @@ class UserService {
                 throw new CustomError(responseCodes.BAD_REQUEST, 'Wrong token try reset password again', 422);
             }
 
-            const params = { password, forgotPasswordToken: null };
+            const params = { password: await generateEncryptedPassword(password), forgotPasswordToken: null };
 
             const result = await User.findOneAndUpdate({ _id: user[0].id }, params, { new: true });
 

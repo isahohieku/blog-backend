@@ -4,8 +4,8 @@ import mg from 'mailgun-js';
 
 class EmailHandler {
     // Configure transport options
-    private api_key: string = process.env.MAILGUN_ACTIVE_API_KEY;
-    private domain: string = process.env.MAILGUN_DOMAIN;
+    private readonly api_key: string = process.env.MAILGUN_ACTIVE_API_KEY;
+    private readonly domain: string = process.env.MAILGUN_DOMAIN;
     private mailgunOptions: mailgunTransport.Options = {
         auth: {
             // eslint-disable-next-line @typescript-eslint/camelcase
@@ -16,7 +16,6 @@ class EmailHandler {
 
     private mailgunTransporter: mailgunTransport.MailgunTransport = mailgunTransport(this.mailgunOptions);
     private transporter: Transporter;
-    private mailgun: mg.Mailgun = mg({ apiKey: this.api_key, domain: this.domain });
 
     public constructor() {
         this.transporter = nodemailer.createTransport(this.mailgunTransporter);
