@@ -7,7 +7,6 @@ import {
 import { User } from '../../../models/user';
 import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
-import responseMessages from '../../../constants/response-messages';
 
 const app = new server().app;
 const request = supertest(app);
@@ -177,7 +176,7 @@ describe('test authentication process - /api/auth/', (): void => {
 
     it('/api/auth/login - User not found', (done): void => {
         const loginWithWrongPassword = {
-            email: 'johndoe@email.com',
+            email: 'johnndoe@email.com',
             password: 'pass'
         };
 

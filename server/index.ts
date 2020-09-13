@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import path from 'path';
-import express, { Application, Response } from 'express';
+import express, {Express, Request, Response } from 'express';
 import { createServer, Server as HTTPServer } from 'http';
 import Db from '../db';
 import swaggerUi from 'swagger-ui-express';
@@ -14,7 +14,7 @@ import * as swaggerDocument from '../doc/swagger.json';
 
 export default class Server {
     private httpServer: HTTPServer;
-    public app: Application;
+    public app: Express;
 
     public constructor() {
         this.setupDb();
@@ -54,7 +54,9 @@ export default class Server {
     }
 
     private handleLandingPage(): void {
-        this.app.get('/api', (req: Request, res: Response): void => res.render('index'));
+        this.app.get('/', (req: Request, res: Response): void => {
+            res.render('index');
+        });
     }
 
     private setupDb(): void {

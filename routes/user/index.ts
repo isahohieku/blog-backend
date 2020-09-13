@@ -1,7 +1,6 @@
 import Route from '../../lib/route';
 import HttpMethod from '../../lib/httpMethod';
 import {
-    validateCreateUser,
     validateUpdateUser,
     validateForgotPassword,
     validateResetPassword,
@@ -36,7 +35,7 @@ const userEndpoints: Route[] = [
     {
         path: `${USER_URL}/user/request-verification`,
         method: HttpMethod.POST,
-        middlewares: [validateEmailVerification],
+        middlewares: [],
         controller: [User.requestVerificaitonEmail]
     },
     {

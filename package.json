@@ -115,9 +115,9 @@
 		"cache": false,
 		"all": false,
 		"report-dir": "./coverage",
-		"lines": 99,
-		"statements": 99,
-		"functions": 99,
+		"lines": 80,
+		"statements": 80,
+		"functions": 80,
 		"branches": 80,
 		"check-coverage": true
 	},

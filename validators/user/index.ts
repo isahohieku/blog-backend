@@ -8,16 +8,6 @@ import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 import Logger from '../../utils/logger';
 
-const createUserValidator = Joi.object().keys({
-    fullName: Joi.string().required(),
-    email: Joi.string()
-        .email()
-        .required(),
-    password: Joi.string().required(),
-    roles: Joi.array().required().min(1),
-    admin: Joi.boolean().optional()
-});
-
 const updateUserValidator = Joi.object().keys({
     id: Joi.string().required(),
     fullName: Joi.string().optional(),
@@ -55,15 +45,6 @@ const throwError = (next, details): void => {
         responseMessages.FORBIDDEN, httpCodes.FORBIDDEN, details);
     Logger('validators/auth.ts', details, 'error');
     next(error);
-};
-
-const validateCreateUser: RouteHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-        await Joi.validate(req.body, createUserValidator);
-        next();
-    } catch (e) {
-        throwError(next, e.details);
-    }
 };
 
 const validateUpdateUser: RouteHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -116,7 +97,6 @@ const validatePasswordUpdate: RouteHandler =
     };
 
 export {
-    validateCreateUser,
     validateUpdateUser,
     validateForgotPassword,
     validateResetPassword,
