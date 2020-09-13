@@ -110,7 +110,8 @@
 			"graphql"
 		],
 		"reporter": [
-			"html"
+			"html",
+			"lcov"
 		],
 		"cache": false,
 		"all": false,
