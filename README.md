@@ -1,3 +1,4 @@
+![Build](https://github.com/isahohieku/blog-backend/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/isahohieku/blog-backend/branch/dev/graph/badge.svg?token=CM05O0HSRT)](https://codecov.io/gh/isahohieku/blog-backend)
 
 # This is a simple nodeJS backend app for a Blog
