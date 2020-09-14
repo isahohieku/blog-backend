@@ -3,7 +3,6 @@
 
 # This is a simple nodeJS backend app for a Blog
 
-
 ## Start Using application
 Run `npm install` or `npm i` to install dependencies
 
@@ -26,19 +25,6 @@ Run `npm install` or `npm i` to install dependencies
 `DB_PORT`
 
 `JWT_SECRET`
-
-## Generate a module
-Run `npm run module` `module name` to generate a module.
-A module comprise of the following file(s): 
-- **module_name.controller.ts**
-- **module_name.data.ts**
-- **module_name.service.ts**
-- **module_name.validators.ts**
-
-## Generate a model
-Run `npm run model` `model name` to generate a model.
-A model comprise of the following file(s): 
-- **model_name.model.ts**
 
 ## Start app in development mode
 Run `npm run dev` to start application in ***development*** mode (**windows OS**).
