@@ -11,4 +11,4 @@ const FollowingSchema = new Schema({
     following: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true});
 
-export const Following = Mongoose.model<FollowingI>('Following', FollowingSchema, 'favourites');
+export const Following = Mongoose.model<FollowingI>('Following', FollowingSchema, 'following');
