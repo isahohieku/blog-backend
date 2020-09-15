@@ -22,8 +22,8 @@ const ArticleSchema = new Schema({
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     slug: { type: String, required: true },
     tags: [{ type: Schema.Types.ObjectId, ref: 'Tag', min: 1 }],
-    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment', min: 1}]
-}, { timestamps: true});
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment'}]
+}, { timestamps: true, toJSON: { virtuals: true }});
 
 ArticleSchema.virtual('likes', {
     ref: 'ArticleLikes',
@@ -46,11 +46,15 @@ ArticleSchema.virtual('favourites', {
     count: true
 });
 
-ArticleSchema.post('find', async (doc: CommentI): Promise<void> => {
-    await doc.populate({ path: 'author', select: 'fullName email avatar' }).execPopulate();
-    await doc.populate('likes').execPopulate();
-    await doc.populate('dislikes').execPopulate();
-    await doc.populate('favourites').execPopulate();
+ArticleSchema.post('find', async (docs: ArticleI[]): Promise<void> => {
+    for (let doc of docs) {
+        await doc.populate({ path: 'author', select: 'fullName email avatar' }).execPopulate();
+        await doc.populate({ path: 'tags', select: 'title' }).execPopulate();
+        await doc.populate('likes').execPopulate();
+        // await doc.populate('dislikes').execPopulate();
+        await doc.populate('favourites').execPopulate();
+    }
+    
 });
 
 export const Article = Mongoose.model<ArticleI>('Article', ArticleSchema, 'articles');
