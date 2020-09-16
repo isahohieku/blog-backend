@@ -5,6 +5,8 @@ import Article from './article';
 import Like from './like';
 import Favourite from './favourite';
 import Follows from './follow';
+import Comment from './comment';
+import CommentLikes from './comment-like';
 
 export default [
     ...Auth,
@@ -13,5 +15,7 @@ export default [
     ...Article,
     ...Like,
     ...Favourite,
-    ...Follows
+    ...Follows,
+    ...Comment,
+    ...CommentLikes
 ];

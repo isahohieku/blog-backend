@@ -4,15 +4,16 @@ import { ArticleI } from 'models/articles';
 
 export interface CommentI extends Document {
     body: string;
-    author: UserI['id'];
-    slug: string;
-    article: ArticleI['id'];
+    author: UserI['_id'];
+    article: ArticleI['_id'];
     likes: number;
     dislikes: number;
 }
 
 const CommentSchema = new Schema({
-    title: { type: String, required: true }
+    body: { type: String, required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    article: { type: Schema.Types.ObjectId, ref: 'Article', required: true }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 CommentSchema.virtual('likes', {
@@ -29,10 +30,12 @@ CommentSchema.virtual('dislikes', {
     count: true
 });
 
-CommentSchema.post('find', async (doc: CommentI): Promise<void> => {
-    await doc.populate({ path: 'author', select: 'fullName email avatar' }).execPopulate();
-    await doc.populate('likes').execPopulate();
-    await doc.populate('dislikes').execPopulate();
+CommentSchema.post('find', async (docs: CommentI[]): Promise<void> => {
+    for (let doc of docs) {
+        await doc.populate({ path: 'author', select: 'fullName email avatar' }).execPopulate();
+        await doc.populate('likes').execPopulate();
+        await doc.populate('dislikes').execPopulate();
+    }
 });
 
 export const Comment = Mongoose.model<CommentI>('Comment', CommentSchema, 'comments');

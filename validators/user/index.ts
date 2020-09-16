@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import * as Joi from 'joi';
 import { RouteHandler } from '../../lib/route';
 import { NextFunction, Request, Response } from 'express';
@@ -8,17 +10,20 @@ import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 import Logger from '../../utils/logger';
 
+const { AVATAR } = process['env'];
+
 const updateUserValidator = Joi.object().keys({
     id: Joi.string().required(),
     fullName: Joi.string().optional(),
     bio: Joi.string().optional(),
+    occupation: Joi.string().optional(),
     password: Joi.string().optional(),
     isEmailVerified: Joi.boolean().optional(),
     adminType: Joi.string().optional()
 });
 
 const updateUserAvatar = Joi.object().keys({
-    blogAvatar: Joi.any().required()
+    [AVATAR]: Joi.any().required()
 });
 
 const updateUserPassword = Joi.object().keys({
