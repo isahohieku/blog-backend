@@ -21,7 +21,7 @@ class ArticleService {
             }
 
             if (author) {
-                result = await Article.find({ author }).populate('favourites');
+                result = await Article.find({ author });
             }
 
             if (slug) {

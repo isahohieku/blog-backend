@@ -7,6 +7,7 @@ export interface UserI extends Document {
     email: string;
     password?: string;
     bio?: string;
+    occupation?: string;
     avatar?: string;
     status?: string;
     isEmailVerified?: boolean;
@@ -28,6 +29,7 @@ const UserSchema = new Schema({
     email: { type: String, lowercase: true, unique: true },
     password: { type: String },
     bio: { type: String },
+    occupation: { type: String },
     status: {
         type: String,
         default: 'pending',
