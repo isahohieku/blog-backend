@@ -37,7 +37,7 @@ const route: Route[] = [
         controller: [Comment.dislike]
     },
     {
-        path: `${COMMENT_URL}/undislike`,
+        path: `${COMMENT_URL}/dislike`,
         method: HttpMethod.DELETE,
         middlewares: [verifyToken],
         controller: [Comment.unDislike]

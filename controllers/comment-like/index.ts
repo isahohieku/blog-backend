@@ -81,11 +81,11 @@ class CommentsLikeService {
             const token: string = pickToken(req);
             const user: Partial<UserI> = verifyTok(null, null, token);
 
-            const like = await CommentDislikes.findOne({ comment, author: user.id });
+            const like: CommentLikesI = await CommentLikes.findOne({ comment, author: user.id });
 
 
             if (like) {
-                const result = await CommentDislikes.findOneAndDelete({ _id: like.id });
+                const result = await CommentLikes.findOneAndDelete({ _id: like.id });
 
                 sendSuccess(res, 'controller:commentlike', result);
                 return;
@@ -131,11 +131,10 @@ class CommentsLikeService {
             const token: string = pickToken(req);
             const user: Partial<UserI> = verifyTok(null, null, token);
 
-            const like: CommentDislikesI = await CommentDislikes.findOne({ comment, author: user.id });
+            const dislike: CommentDislikesI = await CommentDislikes.findOne({ comment, author: user.id });
 
-
-            if (like) {
-                const result = await CommentDislikes.findOneAndDelete({ _id: like.id });
+            if (dislike) {
+                const result = await CommentDislikes.findOneAndDelete({ _id: dislike.id });
 
                 sendSuccess(res, 'controller:commentlike', result);
                 return;

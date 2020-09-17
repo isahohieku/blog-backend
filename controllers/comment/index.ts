@@ -13,7 +13,7 @@ class LikeService {
 
     public async getComments(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { article } = req.body;
+            const { article } = req.query;
 
             const token: string = pickToken(req);
             const user: Partial<UserI> = verifyTok(null, null, token);
@@ -60,7 +60,7 @@ class LikeService {
             const comment: CommentI = await Comment.findOne({ _id: id });
 
             if (comment) {
-                if (comment.author !== user.id) {
+                if (String(comment.author) !== user.id) {
                     throw new CustomError(responseCodes.FORBIDDEN,
                         'You have no privilege to perform this action', httpCodes.FORBIDDEN);
                 }
@@ -82,7 +82,7 @@ class LikeService {
         try {
             const { id } = req.query;
 
-            if (id) {
+            if (!id) {
                 throw new CustomError(responseCodes.INVALID_PARAMS,
                     'id of comment required', httpCodes.FORBIDDEN);
             }
@@ -90,16 +90,13 @@ class LikeService {
             const token: string = pickToken(req);
             const user: Partial<UserI> = verifyTok(null, null, token);
 
-            const comment: CommentI = await Comment.findOne({ _id: id });
+            const comment: CommentI = await Comment.findOne({ _id: id as string });
 
             if (comment) {
-                if (comment.author !== user.id) {
+                if (String(comment.author) !== String(user.id)) {
                     throw new CustomError(responseCodes.FORBIDDEN,
                         'You have no privilege to perform this action', httpCodes.FORBIDDEN);
                 }
-            } else {
-                throw new CustomError(responseCodes.NOT_FOUND,
-                    responseMessage.RESOURCE_NOT_FOUND('Comment'), httpCodes.NOT_FOUND);
             }
 
             const result = await Comment.findOneAndDelete({ _id: id });
@@ -108,6 +105,7 @@ class LikeService {
             return;
 
         } catch (e) {
+            console.log(e);
             next(e);
         }
     }

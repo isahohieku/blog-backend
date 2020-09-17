@@ -6,25 +6,20 @@ import sendSuccess from '../../responses/success';
 import CustomError from '../../responses/error/custom-error';
 import httpCodes from '../../constants/http-status-codes';
 import responseCodes from '../../constants/response-codes';
-import responseMessages from '../../constants/response-messages';
 
 class LikeService {
     public constructor() { }
 
-    public async getLikesArticle(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { article } = req.query;
+    public async getLikesArticle(req: Request, res: Response): Promise<void> {
+        const { article } = req.query;
 
-            const token: string = pickToken(req);
-            const user: Partial<UserI> = verifyTok(null, null, token);
+        const token: string = pickToken(req);
+        const user: Partial<UserI> = verifyTok(null, null, token);
 
-            const result = article ? await ArticleLikes.findOne({ article, author: user.id })
-                : await ArticleLikes.find({ author: user.id });
+        const result = article ? await ArticleLikes.findOne({ article, author: user.id })
+            : await ArticleLikes.find({ author: user.id });
 
-            sendSuccess(res, 'controller:likes', result);
-        } catch (e) {
-            next(e);
-        }
+        sendSuccess(res, 'controller:likes', result);
     }
 
     public async likeArticle(req: Request, res: Response, next: NextFunction): Promise<void> {

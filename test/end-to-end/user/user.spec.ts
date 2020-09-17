@@ -50,7 +50,7 @@ describe('test user data processing - /api/user', (): void => {
                 expect(body).to.have.property('message').not.to.equal('');
 
                 return done();
-            }).timeout(10000);
+            })
     });
 
     describe('User endpoint - /api/user', (): void => {
@@ -203,7 +203,7 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        }).timeout(10000);
+        })
 
         it('/api/user - Forgot Password but email does not exist', (done): void => {
             const data = { email: `${user.email}sd` };
@@ -304,7 +304,7 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        }).timeout(5000);
+        })
 
         it('/api/user - Confirm but email does not exist', (done): void => {
             const data = { email: `${user.email}sd`, verificationToken: user.verificationToken };
@@ -498,6 +498,6 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        }).timeout(10000);
+        })
     });
 });

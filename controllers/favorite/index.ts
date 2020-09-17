@@ -22,7 +22,7 @@ class FavouriteService {
 
             sendSuccess(res, 'controller:likes', result);
         } catch (e) {
-            next(e);
+            next(e); 
         }
     }
 

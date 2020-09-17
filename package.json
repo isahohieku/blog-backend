@@ -5,7 +5,7 @@
 	"main": "./build/app",
 	"scripts": {
 		"prestart": "node check-env.js DB_USER DB_URI DB_PASSWORD DB_NAME JWT_SECRET NODE_ENV LOG_LEVEL",
-		"test": "nyc mocha --exit",
+		"test": "nyc mocha --timeout 10000 --exit",
 		"pretest": "npm run prestart",
 		"pretest-coverage": "npm run prestart",
 		"test-coverage": "istanbul cover _mocha --exit",
@@ -116,10 +116,10 @@
 		"cache": false,
 		"all": false,
 		"report-dir": "./coverage",
-		"lines": 40,
-		"statements": 40,
-		"functions": 40,
-		"branches": 40,
+		"lines": 80,
+		"statements": 80,
+		"functions": 80,
+		"branches": 80,
 		"check-coverage": true
 	},
 	"engines": {

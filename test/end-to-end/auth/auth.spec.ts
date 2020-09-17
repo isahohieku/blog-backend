@@ -38,7 +38,7 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    }).timeout(10000);
+    })
 
     it('/api/auth/ - Valid but existing registration detail', (done): void => {
         request
@@ -172,7 +172,7 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    }).timeout(10000);
+    })
 
     it('/api/auth/login - User not found', (done): void => {
         const loginWithWrongPassword = {
@@ -195,5 +195,5 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    }).timeout(5000);
+    })
 });

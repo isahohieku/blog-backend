@@ -23,7 +23,7 @@ const article: Route[] = [
         path: ARTICLE_URL,
         method: HttpMethod.PUT,
         middlewares: [verifyToken, validateUpdateArticle],
-        controller: [Article.addArticle]
+        controller: [Article.updateArticle]
     }
 ];
 

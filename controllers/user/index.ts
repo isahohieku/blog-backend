@@ -146,7 +146,6 @@ class UserService {
             const userData: Partial<UserI> = verifyTok(req, res, token) as Partial<UserI>;
             const user = await User.findOne({ _id: userData.id }) as UserI;
 
-            console.log(user);
             const password = await passwordMatch(oldPassword, user.password);
 
             if (!password) {
