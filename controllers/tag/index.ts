@@ -6,6 +6,7 @@ import responseCodes from '../../constants/response-codes';
 import responseMessages from '../../constants/response-messages';
 import { pickToken, verifyTok } from '../../utils/auth';
 import { UserI } from '../../models/user';
+import CustomError from '../../responses/error/custom-error';
 
 class TagService {
     public constructor() { }
@@ -16,8 +17,8 @@ class TagService {
             const findTag: TagI = await Tag.findOne({ title: tag });
 
             if (findTag) {
-                sendSuccess(res, 'controller:tag', null, responseMessages.RESOURCE_EXIST('Tag'));
-                return;
+                throw new CustomError(responseCodes.RESOURCE_EXIST,
+                    responseMessages.RESOURCE_EXIST('Tag'), httpCodes.FORBIDDEN);
             }
 
             const token: string = pickToken(req);

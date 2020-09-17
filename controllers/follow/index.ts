@@ -6,26 +6,20 @@ import sendSuccess from '../../responses/success';
 import CustomError from '../../responses/error/custom-error';
 import httpCodes from '../../constants/http-status-codes';
 import responseCodes from '../../constants/response-codes';
-import responseMessages from '../../constants/response-messages';
 
 class LikeService {
     public constructor() { }
 
     public async getAuthorsFollowed(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { following } = req.query;
+        const { following } = req.query;
 
-            const token: string = pickToken(req);
-            const user: Partial<UserI> = verifyTok(null, null, token);
+        const token: string = pickToken(req);
+        const user: Partial<UserI> = verifyTok(null, null, token);
 
-            let result = following ? await Following.findOne({ following, author: user.id })
-                : await Following.find({ author: user.id });
+        let result = following ? await Following.findOne({ following, author: user.id })
+            : await Following.find({ author: user.id });
 
-            sendSuccess(res, 'controller:follow', result);
-
-        } catch (e) {
-            next(e);
-        }
+        sendSuccess(res, 'controller:follow', result);
     }
 
     public async followAuthor(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -36,7 +30,6 @@ class LikeService {
             const user: Partial<UserI> = verifyTok(null, null, token);
 
             const following = await Following.findOne({ following: author, author: user.id });
-
 
             if (!following) {
                 const query = new Following();

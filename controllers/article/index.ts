@@ -25,15 +25,7 @@ class ArticleService {
             }
 
             if (slug) {
-                result = await Article.aggregate(
-                    [
-                        {
-                            '$match': {
-                                'title': new RegExp(slug as string, 'i')
-                            }
-                        }
-                    ]
-                );
+                result = await Article.find({ slug: slug as string });
             }
 
             if (!id && !slug && !author) {
@@ -70,24 +62,21 @@ class ArticleService {
             const token: string = pickToken(req);
             const user: Partial<UserI> = verifyTok(req, res, token);
 
-            const article: ArticleI = await Article.findOne({_id: data.id});
-
+            const article: ArticleI = await Article.findOne({ _id: data.id });
+            
             if (!article) {
                 throw new CustomError(responseCodes.NOT_FOUND,
                     responseMessages.RESOURCE_NOT_FOUND('Article'), httpCodes.NOT_FOUND);
             }
 
-            if (article.author !== user.id) {
+            if (article.author.id !== user.id) {
                 throw new CustomError(responseCodes.FORBIDDEN,
                     'You have no privilege to modify this article', httpCodes.FORBIDDEN);
             }
 
-            const params = {};
+            delete data.id;
 
-            Object.getOwnPropertyNames(data).forEach((item): void => params[item] = data[item]);
-            console.log(params);
-            return;
-            const result = await article.updateOne(article, params);
+            const result = await Article.findOneAndUpdate({ _id: article.id }, data, { new: true });
 
             sendSuccess(res, 'controller:article', result);
 
