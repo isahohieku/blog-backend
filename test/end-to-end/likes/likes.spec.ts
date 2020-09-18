@@ -8,22 +8,23 @@ import { ArticleI, Article } from '../../../models/articles';
 import { TagI, Tag } from '../../../models/tags';
 import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
+import { validRegistrationDetails } from '../../mock-data/user';
 
 const app = new server().app;
 const request = supertest(app);
 
 let user: UserI;
 let article: ArticleI;
-let tagSample: TagI[];
+let savedTag: TagI;
 
 describe('test liking an article - /api/likes', (): void => {
     let sandbox: sinon.SinonSandbox;
     before(async (): Promise<void> => {
-        user = await User.findOne({ email: 'johndoe@email.com' });
-        tagSample = await Tag.find({});
+        user = await new User({ ...validRegistrationDetails }).save();
+        savedTag = await new Tag({ title: 'Test', author: user.id }).save();
         const data: Partial<ArticleI> = {
             body: 'testing', title: 'Just testing',
-            tags: [tagSample[0].id], slug: 'just-testing',
+            tags: [savedTag.id], slug: 'just-testing',
             author: user.id
         };
         const newArticle = new Article(data);
@@ -34,6 +35,8 @@ describe('test liking an article - /api/likes', (): void => {
 
     after(async (): Promise<void> => {
         await Article.findOneAndDelete({ _id: article.id });
+        await Tag.findOneAndDelete({ _id: savedTag.id });
+        await User.findOneAndDelete({ _id: user.id });
         sandbox.restore();
     });
 

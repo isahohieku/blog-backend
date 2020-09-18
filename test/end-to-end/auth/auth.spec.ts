@@ -14,6 +14,9 @@ const request = supertest(app);
 let id: string;
 
 describe('test authentication process - /api/auth/', (): void => {
+    after(async(): Promise<void> => {
+        await User.findOneAndDelete({_id: id});
+    });
 
     it('/api/auth/ - Valid registration detail', (done): void => {
         request
@@ -38,7 +41,7 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    })
+    });
 
     it('/api/auth/ - Valid but existing registration detail', (done): void => {
         request
@@ -83,10 +86,11 @@ describe('test authentication process - /api/auth/', (): void => {
     });
 
     it('/api/auth/login - Valid login detail', (done): void => {
-        delete validRegistrationDetails.fullName;
+        const loginDetail = { ...validRegistrationDetails };
+        delete loginDetail.fullName;
         request
             .post('/api/auth/login')
-            .send(validRegistrationDetails)
+            .send(loginDetail)
             .set('Accept', 'application/json')
             .expect(httpCodes.SUCCESS)
             .end((err, res): void => {
@@ -109,11 +113,12 @@ describe('test authentication process - /api/auth/', (): void => {
     });
 
     it('/api/auth/login - Invalid login detail - Wrong password', (done): void => {
-        delete validRegistrationDetails.fullName;
-        validRegistrationDetails.password = 'pass';
+        const loginDetail = { ...validRegistrationDetails };
+        delete loginDetail.fullName;
+        loginDetail.password = 'pass';
         request
             .post('/api/auth/login')
-            .send(validRegistrationDetails)
+            .send(loginDetail)
             .set('Accept', 'application/json')
             .expect(422)
             .end((err, res): void => {
@@ -129,7 +134,7 @@ describe('test authentication process - /api/auth/', (): void => {
     });
 
     it('/api/auth/login - Invalid login detail: invalid email', (done): void => {
-        const invalidEmail = validRegistrationDetails;
+        const invalidEmail = {...validRegistrationDetails};
         invalidEmail.email = 'heythere';
         request
             .post('/api/auth/login')
@@ -172,7 +177,7 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    })
+    });
 
     it('/api/auth/login - User not found', (done): void => {
         const loginWithWrongPassword = {
@@ -195,5 +200,5 @@ describe('test authentication process - /api/auth/', (): void => {
 
                 return done();
             });
-    })
+    });
 });

@@ -40,7 +40,6 @@ describe('test liking an article - /api/likes', (): void => {
             .end((err, res): void => {
                 expect(err).to.be.null;
                 const { body } = res;
-                console.log(body);
                 tag = body.data;
                 expect(body).to.have.property('code').to.equal(responseCodes.SUCCESS);
                 expect(body).to.have.property('statusCode').to.equal(httpCodes.SUCCESS);

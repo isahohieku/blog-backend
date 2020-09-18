@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { User, UserI } from '../../../models/user';
 import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
+import { validRegistrationDetails } from '../../mock-data/user';
 
 const app = new server().app;
 const request = supertest(app);
@@ -16,7 +17,7 @@ let anotherUser: UserI;
 describe('test following an author - /api/follows', (): void => {
     let sandbox: sinon.SinonSandbox;
     before(async (): Promise<void> => {
-        user = await User.findOne({ email: 'johndoe@email.com' });
+        user = await new User({ ...validRegistrationDetails }).save();
         const newUser: Partial<UserI> = new User({
             email: 'testinguser@email.com',
             password: 'password', fullName: 'Testing User'
@@ -27,6 +28,7 @@ describe('test following an author - /api/follows', (): void => {
     });
 
     after(async (): Promise<void> => {
+        await User.findOneAndDelete({ _id: user.id });
         await User.findOneAndDelete({ _id: anotherUser.id });
         sandbox.restore();
     });

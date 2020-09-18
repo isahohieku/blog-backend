@@ -7,6 +7,7 @@ import { User, UserI } from '../../../models/user';
 import server from '../../../server';
 import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
+import { validRegistrationDetails } from '../../mock-data/user';
 
 const app = new server().app;
 const request = supertest(app);
@@ -16,12 +17,13 @@ let user: UserI;
 describe('test validators', (): void => {
     let sandbox: sinon.SinonSandbox;
     before(async (): Promise<void> => {
-        user = await User.findOne({ email: 'johndoe@email.com' });
+        user = await new User({ ...validRegistrationDetails }).save();
         sandbox = sinon.createSandbox();
         sandbox.stub(jwt, 'verify').callsArgWith(2, null, user);
     });
 
-    after((): void => {
+    after(async(): Promise<void> => {
+        await User.findOneAndDelete({ _id: user.id });
         sandbox.restore();
     });
     it('/api/user - update user with invalid params', (done): void => {
