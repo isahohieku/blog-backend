@@ -8,25 +8,27 @@ import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
 import { ArticleI, Article } from '../../../models/articles';
 import { TagI, Tag } from '../../../models/tags';
+import { validRegistrationDetails } from '../../mock-data/user';
 
 const app = new server().app;
 const request = supertest(app);
 
 let user: UserI;
 let article: ArticleI;
-let tagSample: TagI[];
+let savedTag: TagI;
 
 describe('test user data processing - /api/article', (): void => {
     let sandbox: sinon.SinonSandbox;
     before(async (): Promise<void> => {
-        user = await User.findOne({ email: 'johndoe@email.com' });
-        tagSample = await Tag.find({});
+        user = await new User({ ...validRegistrationDetails }).save();
+        savedTag = await new Tag({ title: 'Test', author: user.id }).save();
         sandbox = sinon.createSandbox();
         sandbox.stub(jwt, 'verify').callsArgWith(2, null, user);
     });
 
     after(async (): Promise<void> => {
-        await Article.findOneAndDelete({ _id: article.id });
+        await Tag.findOneAndDelete({ _id: savedTag.id });
+        await User.findOneAndDelete({ _id: user.id });
         sandbox.restore();
     });
 
@@ -49,7 +51,7 @@ describe('test user data processing - /api/article', (): void => {
     it('/api/article - Add article', (done): void => {
         const data: Partial<ArticleI> = {
             body: 'testing', title: 'Just testing',
-            tags: [tagSample[0].id], slug: 'just-testing'
+            tags: [savedTag.id], slug: 'just-testing'
         };
         request
             .post('/api/article')

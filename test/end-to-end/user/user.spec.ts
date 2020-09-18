@@ -6,12 +6,11 @@ import server from '../../../server';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import jwt from 'jsonwebtoken';
-import { userData, invalidToken } from '../../mock-data/user';
+import { invalidToken, validRegistrationDetails } from '../../mock-data/user';
 import EmailService from '../../../lib/email';
 import { User, UserI } from '../../../models/user';
 import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
-import CustomError from '../../../responses/error/custom-error';
 
 const app = new server().app;
 const request = supertest(app);
@@ -34,7 +33,6 @@ describe('test user data processing - /api/user', (): void => {
             });
     });
 
-
     it('/api/user - Valid user detail with invalid token', (done): void => {
         request
             .get('/api/user')
@@ -50,21 +48,24 @@ describe('test user data processing - /api/user', (): void => {
                 expect(body).to.have.property('message').not.to.equal('');
 
                 return done();
-            })
+            });
     });
 
-    describe('User endpoint - /api/user', (): void => {
+    describe('User endpoint - /api/user: existing user', (): void => {
 
         let sandbox: sinon.SinonSandbox;
         before(async (): Promise<void> => {
-            user = await User.findOne({ email: 'johndoe@email.com' });
+            const newUser: Partial<UserI> = { ...validRegistrationDetails, 
+                isEmailVerified: true, verificationToken: '4b54e1f0-f1ff-11ea-bd01-5b50cc0a7928' };
+            user = await new User(newUser).save();
 
             sandbox = sinon.createSandbox();
             sandbox.stub(jwt, 'verify').callsArgWith(2, null, user);
             sandbox.stub(EmailService, 'sendEmail').resolves(true);
         });
 
-        after((): void => {
+        after(async (): Promise<void> => {
+            await User.findOneAndDelete({ _id: user.id });
             sandbox.restore();
         });
 
@@ -203,7 +204,7 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        })
+        });
 
         it('/api/user - Forgot Password but email does not exist', (done): void => {
             const data = { email: `${user.email}sd` };
@@ -304,7 +305,7 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        })
+        });
 
         it('/api/user - Confirm but email does not exist', (done): void => {
             const data = { email: `${user.email}sd`, verificationToken: user.verificationToken };
@@ -423,39 +424,21 @@ describe('test user data processing - /api/user', (): void => {
                     return done();
                 });
         });
-
-        // it('/api/user - Confirm email', (done): void => {
-        //     const data = { email: user.email, verificationToken: user.verificationToken };
-        //     request
-        //         .put(`/api/user/confirm-email`)
-        //         .send(data)
-        //         .set('Accept', 'application/json')
-        //         .set('Authorization', `Bearer Auth`)
-        //         .expect(httpCodes.SUCCESS)
-        //         .end((err, res): void => {
-        //             expect(err).to.be.null;
-        //             const { body } = res;
-        //             expect(body).to.be.an('object');
-        //             expect(body).to.have.property('code').to.equal(responseCodes.SUCCESS);
-        //             expect(body).to.have.property('statusCode').to.equal(httpCodes.SUCCESS);
-        //             expect(body).to.have.property('message').not.to.equal('');
-
-        //             return done();
-        //         });
-        // });
     });
 
-    describe('User enpoint - /api/user', (): void => {
+    describe('User enpoint - /api/user: none existing user', (): void => {
         let sandbox: sinon.SinonSandbox;
         before(async (): Promise<void> => {
-            user = await User.findOne({ email: 'johndoe@email.com' });
+            user = await new User({ ...validRegistrationDetails }).save();
+
             const newLogin = { ...user };
             newLogin._id = '5f5defeed9548a81ca0a1e0e';
             sandbox = sinon.createSandbox();
             sandbox.stub(jwt, 'verify').callsArgWith(2, null, newLogin);
         });
 
-        after((): void => {
+        after(async (): Promise<void> => {
+            await User.findOneAndDelete({ _id: user.id });
             sandbox.restore();
         });
 
@@ -498,6 +481,6 @@ describe('test user data processing - /api/user', (): void => {
 
                     return done();
                 });
-        })
+        });
     });
 });

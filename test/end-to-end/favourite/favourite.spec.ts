@@ -8,52 +8,38 @@ import httpCodes from '../../../constants/http-status-codes';
 import responseCodes from '../../../constants/response-codes';
 import { ArticleI, Article } from '../../../models/articles';
 import { TagI, Tag } from '../../../models/tags';
-import { Favourite, FavouriteI } from '../../../models/favourites';
+import { FavouriteI } from '../../../models/favourites';
+import { validRegistrationDetails } from '../../mock-data/user';
 
 const app = new server().app;
 const request = supertest(app);
 
 let user: UserI;
 let article: ArticleI;
-let tagSample: TagI[];
+let savedTag: TagI;
 let favourite: FavouriteI;
 
 describe('test favourite article - /api/article/favourite', (): void => {
     let sandbox: sinon.SinonSandbox;
     before(async (): Promise<void> => {
-        user = await User.findOne({ email: 'johndoe@email.com' });
-        tagSample = await Tag.find({});
+        user = await new User({ ...validRegistrationDetails }).save();
+        savedTag = await new Tag({ title: 'Test', author: user.id }).save();
+        const data: Partial<ArticleI> = {
+            body: 'testing', title: 'Just testing',
+            tags: [savedTag.id], slug: 'just-testing',
+            author: user.id
+        };
+        const newArticle = new Article(data);
+        article = await newArticle.save();
         sandbox = sinon.createSandbox();
         sandbox.stub(jwt, 'verify').callsArgWith(2, null, user);
     });
 
     after(async (): Promise<void> => {
         await Article.findOneAndDelete({ _id: article.id });
-        await Favourite.findOneAndDelete({ _id: favourite.id });
+        await Tag.findOneAndDelete({ _id: savedTag.id });
+        await User.findOneAndDelete({ _id: user.id });
         sandbox.restore();
-    });
-
-    it('/api/article - Add article', (done): void => {
-        const data: Partial<ArticleI> = {
-            body: 'testing', title: 'Just testing',
-            tags: [tagSample[0].id], slug: 'just-testing'
-        };
-        request
-            .post('/api/article')
-            .set('Accept', 'application/json')
-            .set('Authorization', 'Bearer Auth')
-            .send(data)
-            .expect(httpCodes.SUCCESS)
-            .end((err, res): void => {
-                expect(err).to.be.null;
-                const { body } = res;
-                article = body.data;
-                expect(body).to.be.an('object');
-                expect(body).to.have.property('code').to.equal(responseCodes.SUCCESS);
-                expect(body).to.have.property('statusCode').to.equal(httpCodes.SUCCESS);
-
-                done();
-            });
     });
 
     it('/api/article/favourite - All favourite articles by a user', (done): void => {
@@ -71,7 +57,7 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 
     it('/api/article/favourite - favourite an article', (done): void => {
         request
@@ -89,7 +75,7 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 
     it('/api/article/favourite - favourite an article already favourited', (done): void => {
         request
@@ -105,7 +91,7 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').not.to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 
     it('/api/article/favourite - A favourited article by a user', (done): void => {
         request
@@ -122,7 +108,7 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 
     it('/api/article/favourite - unfavourite an article', (done): void => {
         request
@@ -139,7 +125,7 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 
     it('/api/article/favourite - unfavourite an article already unfavourited', (done): void => {
         request
@@ -155,5 +141,5 @@ describe('test favourite article - /api/article/favourite', (): void => {
                 expect(body).to.have.property('message').not.to.equal('');
                 return done();
             });
-    });
+    }).timeout(5000);
 });
